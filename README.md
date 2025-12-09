@@ -1,31 +1,58 @@
-# VersionConnector
+<table align="center">
+  <tr>
+    <td style="vertical-align: middle;">
+      <img src="https://i.imgur.com/0OyWj7F.gif" width="350" alt="VersionConnector Animation">
+    </td>
+    <td style="padding-left: 24px; vertical-align: middle;">
+      <samp>
+        <strong>VersionConnector</strong> – Multi-Version Bungee Plugin<br>
+        <small>
+          Fork Version: <code>2.0.0</code> | Minecraft <code>1.8 ~ 1.21+</code>
+        </small><br><br>
+        <img alt="Java" src="https://img.shields.io/badge/-Java-blue?style=for-the-badge&logo=java&logoColor=white">
+        <img alt="BungeeCord" src="https://img.shields.io/badge/-BungeeCord-orange?style=for-the-badge&logo=apachekafka&logoColor=white">
+        <img alt="Minecraft" src="https://img.shields.io/badge/-1.21+_Supported-green?style=for-the-badge&logo=minecraft&logoColor=white">
+        <br><br>
+        <span style="color:#ff4444;"><strong>⚠️ WARNING:</strong></span>
+        This is a <b>fork</b> of the original VersionConnector plugin<br>
+        with added support for newer Minecraft versions <b>(from 1.21 onwards)</b>.
+        <br><br>
+        Connect different Minecraft client versions to dedicated servers.<br>
+        Includes automatic version-based routing, simple load-balancing,<br>
+        and Forge switch support.<br>
+        <br>
+        <a href="http://ci.minebench.de/job/VersionConnector/" target="_blank">
+          <strong>Development builds &rarr; Minebench Jenkins</strong>
+        </a>
+      </samp>
+    </td>
+  </tr>
+</table>
+<br>
 
-> ⚠️ **WARNING:** This is a fork of the original VersionConnector plugin with added support for newer Minecraft versions (from 1.21 onwards).
+---
 
-Bungee plugin to connect different Minecraft client versions to different servers on join or server switch. Includes simple load balancing and Forge switch. (Forge can only be detected with 1.8-1.13 clients!)
+## Supported Versions
 
-Development builds can be found on the [Minebench](https://www.minebench.de) Jenkins as usual: http://ci.minebench.de/job/VersionConnector/
+VersionConnector uses easy constants for version-based routing.  
+See [ProtocolVersion.java](https://github.com/Minebench/VersionConnector/blob/master/src/main/java/de/themoep/versionconnector/ProtocolVersion.java) for full details.
 
-## Versions directly supported:
+It will fallback to the closest protocol below the actual client version, or you can set protocol versions directly.
 
-The plugin contains some constants which can be used to specify a version string instead of the protocol version. See [this class](https://github.com/Minebench/VersionConnector/blob/master/src/main/java/de/themoep/versionconnector/ProtocolVersion.java) for a full list of them.
+---
 
-It will fallback to the version with the closest protocol number below the actual client's protocol. You can however set the protocol version directly if you want or submit additions to the [ProtocolVersion](https://github.com/Minebench/VersionConnector/blob/master/src/main/java/de/themoep/versionconnector/ProtocolVersion.java) enum.
+## Example Config
 
-## Config:
-
-``` yaml
+```yaml
 debug: false
-# Minimum amount of players that need to be online on one server to start balancing
-# new players to the other server (e.g. between lobby_1_8_a & lobby_1_8_b)
 start-balancing: 0
 join:
   lobby:
     versions:
-      '34': lobby_prot_34 # Lobby for specific protocol version
-      '1_8': lobby_1_8_a, lobby_1_8_b # Lobbies for 1.8
-      '1_9': lobby_1_9 # Lobby for 1.9
-      UNKNOWN: well_we_dont_know # Lobby for an Unknown version (not a fallback if no config for version was found!)
+      '34': lobby_prot_34
+      '1_8': lobby_1_8_a, lobby_1_8_b
+      '1_9': lobby_1_9
+      UNKNOWN: well_we_dont_know
     forge:
       '1_9': forge_lobby_1_9
       '1_8': forge_lobby_1_8_a, forge_lobby_1_8_b
@@ -43,3 +70,19 @@ servers:
     mods:
       "modname1,modname2": mod_server
 ```
+
+---
+
+## Features
+
+- Route players based on Minecraft version (supports 1.8–1.21+)
+- Simple load balancing across lobbies and servers
+- Detect and redirect Forge clients (1.8–1.13)
+- Mod-based routing
+- Easy YAML configuration
+
+---
+
+For plugin updates, issues, and community join:
+- [Minebench Jenkins](http://ci.minebench.de/job/VersionConnector/)
+- [Repository](https://github.com/LorenzoZ-DEV/VersionConnector)
