@@ -1,4 +1,7 @@
 # VersionConnector
+
+> ⚠️ **WARNING:** This is a fork of the original VersionConnector plugin with added support for newer Minecraft versions (from 1.21 onwards).
+
 Bungee plugin to connect different Minecraft client versions to different servers on join or server switch. Includes simple load balancing and Forge switch. (Forge can only be detected with 1.8-1.13 clients!)
 
 Development builds can be found on the [Minebench](https://www.minebench.de) Jenkins as usual: http://ci.minebench.de/job/VersionConnector/
