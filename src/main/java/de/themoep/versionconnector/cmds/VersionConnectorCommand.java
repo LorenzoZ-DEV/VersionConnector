@@ -4,194 +4,233 @@ import de.themoep.versionconnector.VersionConnector;
 import de.themoep.versionconnector.protocols.ProtocolVersion;
 import de.themoep.versionconnector.routing.ConnectorInfo;
 import de.themoep.versionconnector.util.C;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.annotation.Description;
+import revxrsal.commands.annotation.Usage;
+import revxrsal.commands.bungee.actor.BungeeCommandActor;
+import revxrsal.commands.bungee.annotation.CommandPermission;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-/*
- * Licensed under the Nietzsche Public License v0.6
- *
- * Copyright 2016 Max Lee (https://github.com/Phoenix616/)
- *
- * Copyright, like God, is dead.  Let its corpse serve only to guard against its
- * resurrection.  You may do anything with this work that copyright law would
- * normally restrict so long as you retain the above notice(s), this license, and
- * the following misquote and disclaimer of warranty with all redistributed
- * copies, modified or verbatim.  You may also replace this license with the Open
- * Works License, available at the http://owl.apotheon.org website.
- *
- *    Copyright is dead.  Copyright remains dead, and we have killed it.  How
- *    shall we comfort ourselves, the murderers of all murderers?  What was
- *    holiest and mightiest of all that the world of censorship has yet owned has
- *    bled to death under our knives: who will wipe this blood off us?  What
- *    water is there for us to clean ourselves?  What festivals of atonement,
- *    what sacred games shall we have to invent?  Is not the greatness of this
- *    deed too great for us?  Must we ourselves not become authors simply to
- *    appear worthy of it?
- *                                     - apologies to Friedrich Wilhelm Nietzsche
- *
- * No warranty is implied by distribution under the terms of this license.
- */
+@Description("Mostra informazioni su VersionConnector e comandi correlati")
+public class VersionConnectorCommand {
 
-public class VersionConnectorCommand extends Command {
     private final VersionConnector plugin;
+    private final String basePermission;
 
     public VersionConnectorCommand(VersionConnector plugin) {
-        super(plugin.getDescription().getName(), plugin.getDescription().getName().toLowerCase() + ".command", "vc", "vercon");
         this.plugin = plugin;
+        this.basePermission = plugin.getDescription().getName().toLowerCase() + ".command";
     }
 
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if(args.length > 0) {
-            if("check".equalsIgnoreCase(args[0])) {
-                if(!sender.hasPermission(getPermission() + ".check")) {
-                    sender.sendMessage(C.translate("&cYou don't have the permission ") + getPermission() + ".check");
-                    return;
-                }
-                if(args.length == 1) {
-                    if(plugin.getProxy().getOnlineCount() == 0) {
-                        sender.sendMessage(C.translate("&CNo players are online."));
+    // /vc, /vercon, /versionconnector
+    @Command({"vc", "vercon", "versionconnector"})
+    @Description("Mostra informazioni sul plugin VersionConnector")
+    public void main(BungeeCommandActor actor) {
+        actor.reply(C.translate("&b" + plugin.getDescription().getName()
+                + "&e version " + plugin.getDescription().getVersion()));
+        actor.reply(C.translate("&bUsage: &e/vc check [<player>|-all]"));
+        actor.reply(C.translate("&b       &e/vc config"));
+        actor.reply(C.translate("&b       &e/vc reload"));
+    }
+
+    // /vc check (senza argomenti -> riepilogo versioni/mods online)
+    @Command({"vc check", "vercon check", "versionconnector check"})
+    @Description("Mostra le versioni dei client e i mod attivi dei giocatori online")
+    @CommandPermission("%plugin%.command.check")
+    public void checkAllSummary(BungeeCommandActor actor) {
+        if (plugin.getProxy().getOnlineCount() == 0) {
+            actor.reply(C.translate("&cNo players are online."));
+            return;
+        }
+
+        Map<Integer, Integer> versionMap = new LinkedHashMap<>();
+        Map<Integer, Integer> forgeMap = new LinkedHashMap<>();
+        Map<String, Integer> modsMap = new LinkedHashMap<>();
+
+        for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
+            int version = plugin.getVersion(player);
+            if (plugin.isForge(player)) {
+                forgeMap.put(version, forgeMap.getOrDefault(version, 0) + 1);
+            } else {
+                versionMap.put(version, versionMap.getOrDefault(version, 0) + 1);
+            }
+            if (!player.getModList().isEmpty()) {
+                String mods = player.getModList().keySet().stream()
+                        .sorted(String::compareToIgnoreCase)
+                        .collect(Collectors.joining(","));
+                modsMap.put(mods, modsMap.getOrDefault(mods, 0) + 1);
+            }
+        }
+
+        actor.reply(C.translate("&6Player versions:"));
+        versionMap.entrySet().stream()
+                .sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getKey)))
+                .forEach(e -> {
+                    ProtocolVersion version = ProtocolVersion.getVersion(e.getKey());
+                    if (version != ProtocolVersion.UNKNOWN) {
+                        actor.reply(C.translate("&b" + version + "&e: &6" + e.getValue()));
                     } else {
-                        Map<Integer, Integer> versionMap = new LinkedHashMap<>();
-                        Map<Integer, Integer> forgeMap = new LinkedHashMap<>();
-                        Map<String, Integer> modsMap = new LinkedHashMap<>();
-                        for(ProxiedPlayer player : plugin.getProxy().getPlayers()) {
-                            int version = plugin.getVersion(player);
-                            if (plugin.isForge(player)) {
-                                forgeMap.put(version, forgeMap.getOrDefault(version, 0) + 1);
-                            } else {
-                                versionMap.put(version, versionMap.getOrDefault(version, 0) + 1);
-                            }
-                            if (player.getModList().size() > 0) {
-                                String mods = player.getModList().keySet().stream().sorted(String::compareToIgnoreCase).collect(Collectors.joining(","));
-                                modsMap.put(mods, modsMap.getOrDefault(mods, 0) + 1);
-                            }
-                        }
-
-                        sender.sendMessage(C.translate("&6Player versions:"));
-                        versionMap.entrySet().stream().sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getKey))).forEach(e -> {
-                            ProtocolVersion version = ProtocolVersion.getVersion(e.getKey());
-                            if (version != ProtocolVersion.UNKNOWN) {
-                                sender.sendMessage(ChatColor.AQUA + version.toString() + ": " + ChatColor.YELLOW + e.getValue());
-                            } else {
-                                sender.sendMessage(ChatColor.AQUA + String.valueOf(e.getKey()) + ": " + ChatColor.YELLOW + e.getValue());
-                            }
-                        });
-                        if(forgeMap.size() > 0) {
-                            sender.sendMessage(C.translate("&8Forge versions:"));
-                            forgeMap.entrySet().stream().sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getKey))).forEach(e -> {
-                                ProtocolVersion version = ProtocolVersion.getVersion(e.getKey());
-                                if (version != ProtocolVersion.UNKNOWN) {
-                                    sender.sendMessage(C.translate("&b") + version.toString() + ": " + C.translate("&6") + e.getValue());
-                                } else {
-                                    sender.sendMessage(C.translate("&b") + String.valueOf(e.getKey()) + ": " + C.translate("&6") + e.getValue());
-                                }
-                            });
-                        }
-                        if (modsMap.size() > 0) {
-                            sender.sendMessage(C.translate("&cMods"));
-                            modsMap.entrySet().stream().sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getValue)))
-                                    .forEach(e -> sender.sendMessage(C.translate("&b") + e.getKey() + ": " + C.translate("&6") + e.getValue()));
-                        }
+                        actor.reply(C.translate("&b" + e.getKey() + "&e: &6" + e.getValue()));
                     }
-                } else {
-                    List<ProxiedPlayer> players = new ArrayList<ProxiedPlayer>();
-                    if("-all".equalsIgnoreCase(args[1])) {
-                        if(!sender.hasPermission(getPermission() + ".check.all")) {
-                            sender.sendMessage(C.translate("&cYou don't have the permission")  + getPermission() + ".check.all");
-                            return;
-                        }
-                        players.addAll(plugin.getProxy().getPlayers());
-                    } else {
-                        if(!sender.hasPermission(getPermission() + ".check.other")) {
-                            sender.sendMessage(C.translate("&cYou don't have the permission")  + getPermission() + ".check.other");
-                            return;
-                        }
-                        for(int i = 1; i < args.length; i++) {
-                            ProxiedPlayer player = plugin.getProxy().getPlayer(args[i]);
-                            if(player != null) {
-                                players.add(player);
-                            } else {
-                                sender.sendMessage(C.translate(args[i] + " &cis not online."));
-                            }
-                        }
-                    }
+                });
 
-                    players.sort(Collections.reverseOrder(Comparator.comparingInt(plugin::getVersion)));
-
-                    for(ProxiedPlayer player : players) {
-                        int rawVersion = plugin.getVersion(player);
-                        sender.sendMessage(C.translate("&b" + player.getName() + "&e:"  +  ProtocolVersion.getVersion(rawVersion) + "/" + rawVersion + "/forge: " + plugin.isForge(player) + "/mods: " + player.getModList().entrySet().stream().map(e -> e.getKey() + "(" + e.getValue() + ")").collect(Collectors.joining(", "))));
-                    }
-                }
-            } else if("config".equalsIgnoreCase(args[0])) {
-                if(!sender.hasPermission(getPermission() + ".config")) {
-                    sender.sendMessage(C.translate("&cYou don't have the permission")  + getPermission() + ".config");
-                    return;
-                }
-                sender.sendMessage(C.translate("&bDebug: &e" + plugin.isDebug()));
-                sender.sendMessage(C.translate("&bStarting balancing at &6" + plugin.getStartBalancing()));
-
-                for (Map.Entry<String, ConnectorInfo> entry : plugin.getConnectorMap().entrySet()) {
-                    sender.sendMessage(ChatColor.YELLOW + entry.getKey() + " configuration:");
-
-                    if (entry.getValue().getVanillaMap().isEmpty()) {
-                        sender.sendMessage(ChatColor.AQUA + "  No versions config.");
-                    } else {
-                        sender.sendMessage(ChatColor.YELLOW + "  Versions:");
-                        for (Map.Entry<Integer, List<ServerInfo>> versionEntry : entry.getValue().getVanillaMap().entrySet()) {
-                            ProtocolVersion protocolVersion = ProtocolVersion.getVersion(versionEntry.getKey());
-                            sender.sendMessage(ChatColor.AQUA + "    " + (protocolVersion != ProtocolVersion.UNKNOWN ? protocolVersion : versionEntry.getKey()) + ": "
-                                    + ChatColor.YELLOW + versionEntry.getValue().stream().map(ServerInfo::getName).collect(Collectors.joining(", ")));
+        if (!forgeMap.isEmpty()) {
+            actor.reply(C.translate("&8Forge versions:"));
+            forgeMap.entrySet().stream()
+                    .sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getKey)))
+                    .forEach(e -> {
+                        ProtocolVersion version = ProtocolVersion.getVersion(e.getKey());
+                        if (version != ProtocolVersion.UNKNOWN) {
+                            actor.reply(C.translate("&b" + version + "&e: &6" + e.getValue()));
+                        } else {
+                            actor.reply(C.translate("&b" + e.getKey() + "&e: &6" + e.getValue()));
                         }
-                    }
+                    });
+        }
 
-                    if (entry.getValue().getForgeMap().isEmpty()) {
-                        sender.sendMessage(ChatColor.AQUA + "  No forge config.");
-                    } else {
-                        sender.sendMessage(ChatColor.YELLOW + "  Forge:");
-                        for (Map.Entry<Integer, List<ServerInfo>> versionEntry : entry.getValue().getForgeMap().entrySet()) {
-                            ProtocolVersion protocolVersion = ProtocolVersion.getVersion(versionEntry.getKey());
-                            sender.sendMessage(ChatColor.AQUA + "    " + (protocolVersion != ProtocolVersion.UNKNOWN ? protocolVersion : versionEntry.getKey()) + ": "
-                                    + ChatColor.YELLOW + versionEntry.getValue().stream().map(ServerInfo::getName).collect(Collectors.joining(", ")));
-                        }
-                    }
+        if (!modsMap.isEmpty()) {
+            actor.reply(C.translate("&cMods"));
+            modsMap.entrySet().stream()
+                    .sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getValue)))
+                    .forEach(e ->
+                            actor.reply(C.translate("&b" + e.getKey() + "&e: &6" + e.getValue()))
+                    );
+        }
+    }
 
-                    if (entry.getValue().getModMap().isEmpty()) {
-                        sender.sendMessage(ChatColor.AQUA + "  No mods config.");
-                    } else {
-                        sender.sendMessage(ChatColor.YELLOW + "  Mods:");
-                        for (Map.Entry<String[], List<ServerInfo>> modEntry : entry.getValue().getModMap().entrySet()) {
-                            sender.sendMessage(ChatColor.AQUA + "    " + String.join(",", modEntry.getKey()) + ": "
-                                    + ChatColor.YELLOW + modEntry.getValue().stream().map(ServerInfo::getName).collect(Collectors.joining(", ")));
-                        }
-                    }
-                }
-            } else if("reload".equalsIgnoreCase(args[0])) {
-                if(!sender.hasPermission(getPermission() + ".reload")) {
-                    sender.sendMessage(ChatColor.RED + "You don't have the permission " + getPermission() + ".reload");
-                    return;
-                }
-                if(plugin.loadConfig()) {
-                    sender.sendMessage(ChatColor.GREEN + "Config reloaded!");
-                } else {
-                    sender.sendMessage(ChatColor.RED + "Error occured while reloading the config! Take a look at the console log.");
+    // /vc check -all
+    @Command({"vc check -all", "vercon check -all", "versionconnector check -all"})
+    @Description("Mostra le informazioni di connessione per tutti i giocatori online")
+    @CommandPermission("%plugin%.command.check.all")
+    public void checkAllPlayers(BungeeCommandActor actor) {
+        List<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
+        players.sort(Collections.reverseOrder(Comparator.comparingInt(plugin::getVersion)));
+
+        for (ProxiedPlayer player : players) {
+            int rawVersion = plugin.getVersion(player);
+            String msg = String.format(
+                    "&b%s&e: %s/%d/forge: %s/mods: %s",
+                    player.getName(),
+                    ProtocolVersion.getVersion(rawVersion),
+                    rawVersion,
+                    plugin.isForge(player),
+                    player.getModList().entrySet().stream()
+                            .map(e -> e.getKey() + "(" + e.getValue() + ")")
+                            .collect(Collectors.joining(", "))
+            );
+            actor.reply(C.translate(msg));
+        }
+    }
+
+    // /vc check <player...>
+    @Command({"vc check", "vercon check", "versionconnector check"})
+    @Usage("<player> [altri giocatori...]")
+    @Description("Mostra le informazioni di connessione dei giocatori specificati")
+    @CommandPermission("%plugin%.command.check.other")
+    public void checkSpecificPlayers(BungeeCommandActor actor, String... playerNames) {
+        if (playerNames == null || playerNames.length == 0) {
+            actor.error(C.translate("&cUtilizzo: /vc check <player> [altri giocatori...]"));
+            return;
+        }
+
+        List<ProxiedPlayer> players = new ArrayList<>();
+
+        for (String name : playerNames) {
+            ProxiedPlayer player = plugin.getProxy().getPlayer(name);
+            if (player != null) {
+                players.add(player);
+            } else {
+                actor.reply(C.translate(name + " &cis not online."));
+            }
+        }
+
+        players.sort(Collections.reverseOrder(Comparator.comparingInt(plugin::getVersion)));
+
+        for (ProxiedPlayer player : players) {
+            int rawVersion = plugin.getVersion(player);
+            String msg = String.format(
+                    "&b%s&e: %s/%d/forge: %s/mods: %s",
+                    player.getName(),
+                    ProtocolVersion.getVersion(rawVersion),
+                    rawVersion,
+                    plugin.isForge(player),
+                    player.getModList().entrySet().stream()
+                            .map(e -> e.getKey() + "(" + e.getValue() + ")")
+                            .collect(Collectors.joining(", "))
+            );
+            actor.reply(C.translate(msg));
+        }
+    }
+
+    @Command({"vc config", "vercon config", "versionconnector config"})
+    @Description("Mostra la configurazione delle route di VersionConnector")
+    @CommandPermission("%plugin%.command.config")
+    public void config(BungeeCommandActor actor) {
+        actor.reply(C.translate("&bDebug: &e" + plugin.isDebug()));
+        actor.reply(C.translate("&bStarting balancing at &6" + plugin.getStartBalancing()));
+
+        for (Map.Entry<String, ConnectorInfo> entry : plugin.getConnectorMap().entrySet()) {
+            actor.reply(C.translate("&e" + entry.getKey() + " configuration:"));
+            ConnectorInfo info = entry.getValue();
+
+            if (info.getVanillaMap().isEmpty()) {
+                actor.reply(C.translate("&b  No versions config."));
+            } else {
+                actor.reply(C.translate("&e  Versions:"));
+                for (Map.Entry<Integer, List<ServerInfo>> versionEntry : info.getVanillaMap().entrySet()) {
+                    ProtocolVersion protocolVersion = ProtocolVersion.getVersion(versionEntry.getKey());
+                    String versionName = protocolVersion != ProtocolVersion.UNKNOWN
+                            ? protocolVersion.toString()
+                            : String.valueOf(versionEntry.getKey());
+                    actor.reply(C.translate("&b    " + versionName + "&e: &6"
+                            + versionEntry.getValue().stream()
+                            .map(ServerInfo::getName)
+                            .collect(Collectors.joining(", "))));
                 }
             }
+
+            if (info.getForgeMap().isEmpty()) {
+                actor.reply(C.translate("&b  No forge config."));
+            } else {
+                actor.reply(C.translate("&e  Forge:"));
+                for (Map.Entry<Integer, List<ServerInfo>> versionEntry : info.getForgeMap().entrySet()) {
+                    ProtocolVersion protocolVersion = ProtocolVersion.getVersion(versionEntry.getKey());
+                    String versionName = protocolVersion != ProtocolVersion.UNKNOWN
+                            ? protocolVersion.toString()
+                            : String.valueOf(versionEntry.getKey());
+                    actor.reply(C.translate("&b    " + versionName + "&e: &6"
+                            + versionEntry.getValue().stream()
+                            .map(ServerInfo::getName)
+                            .collect(Collectors.joining(", "))));
+                }
+            }
+
+            if (info.getModMap().isEmpty()) {
+                actor.reply(C.translate("&b  No mods config."));
+            } else {
+                actor.reply(C.translate("&e  Mods:"));
+                for (Map.Entry<String[], List<ServerInfo>> modEntry : info.getModMap().entrySet()) {
+                    actor.reply(C.translate("&b    " + String.join(",", modEntry.getKey()) + "&e: &6"
+                            + modEntry.getValue().stream()
+                            .map(ServerInfo::getName)
+                            .collect(Collectors.joining(", "))));
+                }
+            }
+        }
+    }
+
+    @Command({"vc reload", "vercon reload", "versionconnector reload"})
+    @Description("Ricarica la configurazione di VersionConnector")
+    @CommandPermission("%plugin%.command.reload")
+    public void reload(BungeeCommandActor actor) {
+        if (plugin.loadConfig()) {
+            actor.reply(C.translate("&aConfig reloaded!"));
         } else {
-            sender.sendMessage(ChatColor.AQUA + plugin.getDescription().getName() + ChatColor.YELLOW + " version " + plugin.getDescription().getVersion());
-            sender.sendMessage(ChatColor.AQUA + "Usage: " + ChatColor.YELLOW + "/vc [check [<player>]|config|reload]");
+            actor.error(C.translate("&cError occured while reloading the config! Take a look at the console log."));
         }
     }
 }

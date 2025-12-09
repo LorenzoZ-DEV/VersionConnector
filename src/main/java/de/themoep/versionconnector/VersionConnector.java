@@ -12,6 +12,9 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
+import revxrsal.commands.Lamp;
+import revxrsal.commands.bungee.BungeeLamp;
+import revxrsal.commands.bungee.actor.BungeeCommandActor;
 
 import java.util.Collections;
 import java.util.Map;
@@ -37,8 +40,11 @@ public class VersionConnector extends Plugin {
         } else {
             getLogger().severe("VersionConnector couldn't load the configuration and will stay disabled.");
         }
+        Lamp<BungeeCommandActor> lamp = BungeeLamp.builder (this).build ();
+        lamp.register(
+                new VersionConnectorCommand(this)
+        );
 
-        getProxy().getPluginManager().registerCommand(this, new VersionConnectorCommand(this));
     }
 
     private void registerListeners() {

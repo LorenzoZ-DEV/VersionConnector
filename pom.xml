@@ -63,6 +63,18 @@
             <version>RELEASE</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.github.revxrsal</groupId>
+            <artifactId>lamp.common</artifactId>
+            <version>4.0.0-rc.10</version>
+        </dependency>
+
+        <!-- Add your specific platform module here -->
+        <dependency>
+            <groupId>io.github.revxrsal</groupId>
+            <artifactId>lamp.bungee</artifactId>
+            <version>4.0.0-rc.10</version>
+        </dependency>
     </dependencies>
 
     <profiles>
