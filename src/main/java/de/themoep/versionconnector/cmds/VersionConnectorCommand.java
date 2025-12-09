@@ -1,5 +1,9 @@
-package de.themoep.versionconnector;
+package de.themoep.versionconnector.cmds;
 
+import de.themoep.versionconnector.VersionConnector;
+import de.themoep.versionconnector.protocols.ProtocolVersion;
+import de.themoep.versionconnector.routing.ConnectorInfo;
+import de.themoep.versionconnector.util.C;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -52,12 +56,12 @@ public class VersionConnectorCommand extends Command {
         if(args.length > 0) {
             if("check".equalsIgnoreCase(args[0])) {
                 if(!sender.hasPermission(getPermission() + ".check")) {
-                    sender.sendMessage(ChatColor.RED + "You don't have the permission " + getPermission() + ".check");
+                    sender.sendMessage(C.translate("&cYou don't have the permission ") + getPermission() + ".check");
                     return;
                 }
                 if(args.length == 1) {
                     if(plugin.getProxy().getOnlineCount() == 0) {
-                        sender.sendMessage(ChatColor.RED + "No player online");
+                        sender.sendMessage(C.translate("&CNo players are online."));
                     } else {
                         Map<Integer, Integer> versionMap = new LinkedHashMap<>();
                         Map<Integer, Integer> forgeMap = new LinkedHashMap<>();
@@ -75,7 +79,7 @@ public class VersionConnectorCommand extends Command {
                             }
                         }
 
-                        sender.sendMessage(ChatColor.YELLOW + "Player versions:");
+                        sender.sendMessage(C.translate("&6Player versions:"));
                         versionMap.entrySet().stream().sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getKey))).forEach(e -> {
                             ProtocolVersion version = ProtocolVersion.getVersion(e.getKey());
                             if (version != ProtocolVersion.UNKNOWN) {
@@ -85,33 +89,33 @@ public class VersionConnectorCommand extends Command {
                             }
                         });
                         if(forgeMap.size() > 0) {
-                            sender.sendMessage(ChatColor.YELLOW + "Forge versions:");
+                            sender.sendMessage(C.translate("&8Forge versions:"));
                             forgeMap.entrySet().stream().sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getKey))).forEach(e -> {
                                 ProtocolVersion version = ProtocolVersion.getVersion(e.getKey());
                                 if (version != ProtocolVersion.UNKNOWN) {
-                                    sender.sendMessage(ChatColor.AQUA + version.toString() + ": " + ChatColor.YELLOW + e.getValue());
+                                    sender.sendMessage(C.translate("&b") + version.toString() + ": " + C.translate("&6") + e.getValue());
                                 } else {
-                                    sender.sendMessage(ChatColor.AQUA + String.valueOf(e.getKey()) + ": " + ChatColor.YELLOW + e.getValue());
+                                    sender.sendMessage(C.translate("&b") + String.valueOf(e.getKey()) + ": " + C.translate("&6") + e.getValue());
                                 }
                             });
                         }
                         if (modsMap.size() > 0) {
-                            sender.sendMessage(ChatColor.YELLOW + "Mods:");
+                            sender.sendMessage(C.translate("&cMods"));
                             modsMap.entrySet().stream().sorted(Collections.reverseOrder(Comparator.comparingInt(Map.Entry::getValue)))
-                                    .forEach(e -> sender.sendMessage(ChatColor.AQUA + e.getKey() + ": " + ChatColor.YELLOW + e.getValue()));
+                                    .forEach(e -> sender.sendMessage(C.translate("&b") + e.getKey() + ": " + C.translate("&6") + e.getValue()));
                         }
                     }
                 } else {
                     List<ProxiedPlayer> players = new ArrayList<ProxiedPlayer>();
                     if("-all".equalsIgnoreCase(args[1])) {
                         if(!sender.hasPermission(getPermission() + ".check.all")) {
-                            sender.sendMessage(ChatColor.RED + "You don't have the permission " + getPermission() + ".check.all");
+                            sender.sendMessage(C.translate("&cYou don't have the permission")  + getPermission() + ".check.all");
                             return;
                         }
                         players.addAll(plugin.getProxy().getPlayers());
                     } else {
                         if(!sender.hasPermission(getPermission() + ".check.other")) {
-                            sender.sendMessage(ChatColor.RED + "You don't have the permission " + getPermission() + ".check.other");
+                            sender.sendMessage(C.translate("&cYou don't have the permission")  + getPermission() + ".check.other");
                             return;
                         }
                         for(int i = 1; i < args.length; i++) {
@@ -119,7 +123,7 @@ public class VersionConnectorCommand extends Command {
                             if(player != null) {
                                 players.add(player);
                             } else {
-                                sender.sendMessage(ChatColor.YELLOW + args[i] + ChatColor.RED + " is not online!");
+                                sender.sendMessage(C.translate(args[i] + " &cis not online."));
                             }
                         }
                     }
@@ -128,16 +132,16 @@ public class VersionConnectorCommand extends Command {
 
                     for(ProxiedPlayer player : players) {
                         int rawVersion = plugin.getVersion(player);
-                        sender.sendMessage(ChatColor.AQUA + player.getName() + ChatColor.YELLOW + ": " + ProtocolVersion.getVersion(rawVersion) + "/" + rawVersion + "/forge: " + plugin.isForge(player) + "/mods: " + player.getModList().entrySet().stream().map(e -> e.getKey() + "(" + e.getValue() + ")").collect(Collectors.joining(", ")));
+                        sender.sendMessage(C.translate("&b" + player.getName() + "&e:"  +  ProtocolVersion.getVersion(rawVersion) + "/" + rawVersion + "/forge: " + plugin.isForge(player) + "/mods: " + player.getModList().entrySet().stream().map(e -> e.getKey() + "(" + e.getValue() + ")").collect(Collectors.joining(", "))));
                     }
                 }
             } else if("config".equalsIgnoreCase(args[0])) {
                 if(!sender.hasPermission(getPermission() + ".config")) {
-                    sender.sendMessage(ChatColor.RED + "You don't have the permission " + getPermission() + ".config");
+                    sender.sendMessage(C.translate("&cYou don't have the permission")  + getPermission() + ".config");
                     return;
                 }
-                sender.sendMessage(ChatColor.AQUA+ "Debug: " + ChatColor.YELLOW + plugin.isDebug());
-                sender.sendMessage(ChatColor.AQUA+ "Start balancing: " + ChatColor.YELLOW + plugin.getStartBalancing());
+                sender.sendMessage(C.translate("&bDebug: &e" + plugin.isDebug()));
+                sender.sendMessage(C.translate("&bStarting balancing at &6" + plugin.getStartBalancing()));
 
                 for (Map.Entry<String, ConnectorInfo> entry : plugin.getConnectorMap().entrySet()) {
                     sender.sendMessage(ChatColor.YELLOW + entry.getKey() + " configuration:");

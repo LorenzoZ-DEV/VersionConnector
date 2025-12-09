@@ -1,4 +1,4 @@
-package de.themoep.versionconnector;
+package de.themoep.versionconnector.routing;
 
 /*
  * Licensed under the Nietzsche Public License v0.6
@@ -25,6 +25,7 @@ package de.themoep.versionconnector;
  * No warranty is implied by distribution under the terms of this license.
  */
 
+import lombok.Getter;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
+@Getter
 public class ConnectorInfo {
 
     private final SortedMap<Integer, List<ServerInfo>> vanillaMap;
@@ -49,18 +51,6 @@ public class ConnectorInfo {
 
         vanillaMap.values().forEach(serverList::addAll);
         forgeMap.values().forEach(serverList::addAll);
-    }
-
-    public SortedMap<Integer, List<ServerInfo>> getVanillaMap() {
-        return vanillaMap;
-    }
-
-    public SortedMap<Integer, List<ServerInfo>> getForgeMap() {
-        return forgeMap;
-    }
-
-    public Map<String[], List<ServerInfo>> getModMap() {
-        return modMap;
     }
 
     /**

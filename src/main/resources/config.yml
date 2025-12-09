@@ -1,26 +1,97 @@
 debug: true
-# Minimum amount of players that need to be online on one server to start balancing
-# new players to the other server (e.g. between lobby_1_8_a & lobby_1_8_b)
-# Use -1 to disable that feature
 start-balancing: 0
-join:
+
+servers:
+
   lobby:
     versions:
-      '34': lobby_prot_34 # Lobby for specific protocol version
-      '1_8': lobby_1_8_a, lobby_1_8_b # Lobbies for 1.8
-      '1_9': lobby_1_9 # Lobby for 1.9
-      UNKNOWN: well_we_dont_know # Lobby for an Unknown version (not a fallback if no config for version was found!)
-    forge:
-      '1_9': forge_lobby_1_9
-      '1_8': forge_lobby_1_8_a, forge_lobby_1_8_b
-    mods:
-      "modname1,modname2": mod_server
+      '47': hub-01     # 1.8 → 1.18.2
+      '759': hub-02    # 1.19 → infinito
+    forge: {}
+
+  #========================#
+  #        MODALITÀ        #
+  #========================#
+  modalita:
+    versions:
+
+      #----------------------------#
+      #     VERSIONI LEGACY        #
+      #   1.8  →  1.18.2           #
+      #----------------------------#
+
+      '47': modalita-01      # 1.8.x
+      '107': modalita-01     # 1.9
+      '108': modalita-01     # 1.9.1
+      '109': modalita-01     # 1.9.2 / 1.9.4
+      '110': modalita-01     # 1.10.x
+      '210': modalita-01     # 1.11.x
+      '315': modalita-01     # 1.12
+      '316': modalita-01     # 1.12.1 / 1.12.2
+      '335': modalita-01     # 1.13
+      '338': modalita-01     # 1.13.1
+      '340': modalita-01     # 1.13.2
+      '393': modalita-01     # 1.14
+      '401': modalita-01     # 1.14.1
+      '404': modalita-01     # 1.14.2
+      '477': modalita-01     # 1.14.3
+      '478': modalita-01     # 1.14.4
+      '573': modalita-01     # 1.15
+      '575': modalita-01     # 1.15.1
+      '578': modalita-01     # 1.15.2
+      '735': modalita-01     # 1.16
+      '736': modalita-01     # 1.16.1
+      '751': modalita-01     # 1.16.2
+      '753': modalita-01     # 1.16.3
+      '754': modalita-01     # 1.16.4 / 1.16.5
+      '755': modalita-01     # 1.17
+      '756': modalita-01     # 1.17.1
+      '757': modalita-01     # 1.18
+      '758': modalita-01     # 1.18.2
+
+      #----------------------------#
+      #     VERSIONI MODERNE       #
+      #   1.19  →  1.21.4+         #
+      #----------------------------#
+
+      '759': modalita-02     # 1.19
+      '760': modalita-02     # 1.19.1 / 1.19.2
+      '761': modalita-02     # 1.19.3
+      '762': modalita-02     # 1.19.4
+      '763': modalita-02     # 1.20
+      '764': modalita-02     # 1.20.1
+      '765': modalita-02     # 1.20.2
+      '766': modalita-02     # 1.20.3 / 1.20.4
+      '767': modalita-02     # 1.20.5 / 1.20.6
+      '768': modalita-02     # 1.21
+      '769': modalita-02     # 1.21.4
+
+      UNKNOWN: modalita-02   # Versioni future
+
+    forge: {}
+
+#---------------------------------------------------------------------------------------#
+#                                                                                       
+# USARE SOLO PER NON AGGIORNARE SEMPRE IL CONFIG.YML QUANDO AGGIORNI IL .JAR DEI SERVER 
+#                                                                                       
+#---------------------------------------------------------------------------------------#
+#
+#debug: true
+#start-balancing: 0
+#
 #servers:
-#  survival:
+#
+#  lobby:
 #    versions:
-#      '1_8': survival_1_8
-#      '1_10': survival_1_10
-#      UNKNOWN: survival_wat
-#    forge:
-#      '1_9': forge_suvival_1_9
-#      '1_8': forge_suvival_1_8_a, forge_suvival_1_8_b
+#      '47': hub-01     # 1.8 → 1.18.2
+#      '759': hub-02    # 1.19 → infinito
+#    forge: {}
+#
+
+#
+#------------------------------------------------------------------------------------------------#
+# RIASSUNTO                                                                                        
+# Configurazione	                UNKNOWN serve?	Devi aggiornare?	     Sicurezza?              
+# Dettagliata (tutte le versioni)	✔ SÌ	         ✔ SÌ (ad ogni release) ✔ MIGLIORE             
+# Pulita (solo 47 e 759)	        ✘ NO	         ✘ NO, mai              ✘ POSSIBILE BYPASSARE  
+#------------------------------------------------------------------------------------------------#

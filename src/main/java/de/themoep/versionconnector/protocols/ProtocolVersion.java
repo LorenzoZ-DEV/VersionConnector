@@ -1,4 +1,4 @@
-package de.themoep.versionconnector;
+package de.themoep.versionconnector.protocols;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,6 +29,28 @@ import java.util.Map;
  */
 
 public enum ProtocolVersion {
+
+    // ma come cazzo devvi porcodio
+    MINECRAFT_1_19_3(761),
+    MINECRAFT_1_19_4(762),
+    MINECRAFT_1_20(763),
+    MINECRAFT_1_20_1(763),
+    MINECRAFT_1_20_2(764),
+    MINECRAFT_1_20_3(765),
+    MINECRAFT_1_20_4(765),
+    MINECRAFT_1_20_5(766),
+    MINECRAFT_1_20_6(765),
+    MINECRAFT_1_21(767),
+    MINECRAFT_1_21_1(765),
+    MINECRAFT_1_21_2(768),
+    MINECRAFT_1_21_3(768),
+    MINECRAFT_1_21_4(769),
+    MINECRAFT_1_21_5(770),
+    MINECRAFT_1_21_6(771),
+    MINECRAFT_1_21_7(772),
+    MINECRAFT_1_21_8(772),
+    MINECRAFT_1_21_9(772),
+    MINECRAFT_1_21_10(773),
     MINECRAFT_1_19_2(760),
     MINECRAFT_1_19_1(760),
     MINECRAFT_1_19(759),
