@@ -1,7 +1,8 @@
 <table align="center">
   <tr>
     <td style="vertical-align: middle;">
-<div class="tenor-gif-embed" data-postid="14609002730158301103" data-share-method="host" data-aspect-ratio="1.79137" data-width="100%"><a href="https://tenor.com/view/hello-gif-14609002730158301103">Hello GIF</a>from <a href="https://tenor.com/search/hello-gifs">Hello GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>   
+      <!-- GIF di presentazione, metti qui quella che preferisci -->
+      <img src="https://media.tenor.com/zl0hgjC3_cgAAAAC/hello.gif" width="350" alt="VersionConnector Animation">
     </td>
     <td style="padding-left: 24px; vertical-align: middle;">
       <samp>
