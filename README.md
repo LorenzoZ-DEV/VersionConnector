@@ -1,7 +1,7 @@
 <table align="center">
   <tr>
     <td style="vertical-align: middle;">
-      <img src="https://i.imgur.com/0OyWj7F.gif" width="350" alt="VersionConnector Animation">
+      <img src="https://media.gifdb.com/anime-student-doing-fast-typing-589gc9a88li07txs.gif" width="350" alt="VersionConnector Animation">
     </td>
     <td style="padding-left: 24px; vertical-align: middle;">
       <samp>
